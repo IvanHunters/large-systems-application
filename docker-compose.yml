@@ -12,11 +12,10 @@ services:
     php:
         image: 'ivanhunt/phpserv:latest'
         container_name: app-php
-        env_file: /home/ubuntu/docker-compose-lemp-stack/.env
         networks:
           - app
         volumes:
-          - /home/ubuntu/docker-compose-lemp-stack/app:/var/www/html
+          - ./app:/var/www/html
         depends_on:
             - db
         deploy:
