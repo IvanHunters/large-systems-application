@@ -1,6 +1,7 @@
 FROM php:7.4-fpm
 
 COPY ./ /var/www/html
+RUN chmod -R 777 /var/www/html/storage
 # debian packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     htop \
@@ -23,9 +24,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN docker-php-ext-install mysqli \
         && docker-php-ext-install pdo_mysql
 
+# php composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN cd /var/www/html \
+    && cp .env.example .env \
+    && composer install
+RUN php artisan key:generate 
+#\
+#    && php artisan migrate
+
 # cleanup
 RUN apt-get clean \
     && rm -fr /var/lib/apt/lists/* \
     && rm -fr /tmp/* \
     && rm -fr /var/tmp/*
+
 WORKDIR /var/www/html
