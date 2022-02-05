@@ -11,8 +11,8 @@ services:
         container_name: app-php
         networks:
           - app
-        volumes:
-          - ./app:/var/www/html
+#        volumes:
+#          - ./app:/var/www/html
         links:
             - db
         depends_on:
