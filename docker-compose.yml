@@ -1,30 +1,22 @@
 
 version: '3.2'
 volumes:
-  data:
-    external:
-      name: test
   database:
-    external: true
-  nginx:
     external: true
 services:
     php:
-        image: 'ivanhunt/phpserv:latest'
+        build:
+          dockerfile: Dockerfile
+          context: "./app"
         container_name: app-php
         networks:
           - app
         volumes:
           - ./app:/var/www/html
+        links:
+            - db
         depends_on:
             - db
-        deploy:
-          replicas: 2
-          restart_policy:
-            condition: on-failure
-          placement:
-            constraints:
-              - node.role == worker
     nginx:
         image: nginx:latest
         container_name: app-nginx
@@ -35,18 +27,10 @@ services:
         networks:
           - app
         ports:
-            - '8083:80'
+            - '7070:80'
         volumes:
             - ./app:/var/www/html
             - ./config/nginx:/etc/nginx/conf.d
-        deploy:
-          replicas: 1
-          restart_policy:
-            condition: on-failure
-          placement:
-            constraints:
-              - node.role == manager
-
 
     db:
       image: "mysql:5.7"
@@ -59,17 +43,8 @@ services:
         MYSQL_DATABASE: test
         MYSQL_USER: test
         MYSQL_PASSWORD: 123
-      ports:
-        - "3306:3306"
       volumes:
         - database:/var/lib/mysql
-      deploy:
-        replicas: 1
-        restart_policy:
-          condition: on-failure
-        placement:
-          constraints:
-            - node.labels.db == true
 
     phpmyadmin:
       image: "phpmyadmin/phpmyadmin"
@@ -85,12 +60,6 @@ services:
         PMA_ARBITRARY: 1
       ports:
         - 8085:80
-      env_file: .env
-      deploy:
-        replicas: 1
-        placement:
-          constraints:
-            - node.labels.db == true
 networks:
   app:
-    driver: overlay
+    driver: bridge
