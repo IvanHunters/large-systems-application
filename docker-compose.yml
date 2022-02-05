@@ -4,6 +4,20 @@ volumes:
   database:
     external: true
 services:
+    db:
+      image: "mysql:5.7"
+      restart: always
+      container_name: "database"
+      networks:
+        - app
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: test
+        MYSQL_USER: test
+        MYSQL_PASSWORD: 123
+      volumes:
+        - database:/var/lib/mysql
+
     php:
         build:
           dockerfile: Dockerfile
@@ -17,6 +31,7 @@ services:
             - db
         depends_on:
             - db
+
     nginx:
         image: nginx:latest
         container_name: app-nginx
@@ -31,20 +46,6 @@ services:
         volumes:
             - ./app:/var/www/html
             - ./config/nginx:/etc/nginx/conf.d
-
-    db:
-      image: "mysql:5.7"
-      restart: always
-      container_name: "database"
-      networks:
-        - app
-      environment:
-        MYSQL_ROOT_PASSWORD: root
-        MYSQL_DATABASE: test
-        MYSQL_USER: test
-        MYSQL_PASSWORD: 123
-      volumes:
-        - database:/var/lib/mysql
 
     phpmyadmin:
       image: "phpmyadmin/phpmyadmin"
