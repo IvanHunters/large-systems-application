@@ -1,7 +1,6 @@
 FROM php:7.4-fpm
 
 COPY ./ /var/www/html
-RUN chmod -R 777 /var/www/html/storage
 # debian packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     htop \
@@ -30,9 +29,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN cd /var/www/html \
     && cp .env.example .env \
     && composer install
+
 RUN php artisan key:generate 
-#\
-#    && php artisan migrate
+
+
+RUN chmod -R 777 /var/www/html/storage
 
 # cleanup
 RUN apt-get clean \
