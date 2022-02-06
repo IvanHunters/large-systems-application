@@ -1,4 +1,3 @@
-
 version: '2.0'
 volumes:
   database:
@@ -11,10 +10,10 @@ services:
       networks:
         - app
       environment:
-        MYSQL_ROOT_PASSWORD: root
-        MYSQL_DATABASE: test
-        MYSQL_USER: test
-        MYSQL_PASSWORD: 123
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER_PASSWORD}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       volumes:
         - database:/var/lib/mysql
 
@@ -42,7 +41,7 @@ services:
         networks:
           - app
         ports:
-            - '7070:80'
+            - ${NGINX_PORT}
         volumes:
             - ./app:/var/www/html
             - ./config/nginx:/etc/nginx/conf.d
@@ -60,7 +59,7 @@ services:
         PMA_PORT: 3306
         PMA_ARBITRARY: 1
       ports:
-        - 8085:80
+        - ${PMA_PORT}
 networks:
   app:
     driver: bridge
